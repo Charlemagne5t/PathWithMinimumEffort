@@ -1,35 +1,31 @@
-import java.util.Arrays;
+import java.util.*;
 
 public class Solution {
-    int globalMinCost = Integer.MAX_VALUE;
     public int minimumEffortPath(int[][] heights) {
         boolean[][] visited = new boolean[heights.length][heights[0].length];
         visited[0][0] = true;
-        dfs(heights, 0, 0, visited, 0);
+        PriorityQueue<int[]> priorityQueue  = new PriorityQueue<>(Comparator.comparingInt(a -> a[2]));
+        int[] start = {0,0,0};
+        priorityQueue.add(start);
+        int min = Integer.MAX_VALUE;
+        while (!priorityQueue.isEmpty()){
+            int[] current = priorityQueue.poll();
+            System.out.println(Arrays.toString(current));
+            if(current[0] == heights.length - 1 && current[1] == heights[0].length - 1){
+                min = Math.min(min, current[2]);
+            }
+            int[][] directions = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
+            visited[current[0]][current[1]] = true;
+            for (int[] dir: directions) {
+                int nextI = current[0] + dir[0];
+                int nextJ = current[1] + dir[1];
+                if(nextI >= 0 && nextI < heights.length && nextJ >= 0 && nextJ < heights[0].length && !visited[nextI][nextJ]){
 
-        return globalMinCost;
-    }
-
-    public void dfs(int[][] heights, int i, int j, boolean[][] visited, int currentScore) {
-        if(i == heights.length - 1 && j == heights[0].length - 1){
-            globalMinCost = Math.min(currentScore, globalMinCost);
-            return;
-        }
-        if(currentScore >= globalMinCost){
-            return;
-        }
-
-        int[][] directions = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
-
-        for (int[] dir: directions) {
-            int nextI = i + dir[0];
-            int nextJ = j + dir[1];
-            if(nextI >= 0 && nextI < heights.length && nextJ >= 0 && nextJ < heights[0].length && !visited[nextI][nextJ]){
-                visited[nextI][nextJ] = true;
-                dfs(heights, nextI, nextJ, visited, Math.max(Math.abs(heights[i][j] - heights[nextI][nextJ]), currentScore));
-                visited[nextI][nextJ] = false;
+                    priorityQueue.add(new int[]{nextI, nextJ, Math.max(current[2], Math.abs(heights[current[0]][current[1]] - heights[nextI][nextJ]))});
+                }
             }
         }
 
+        return min;
     }
 }
